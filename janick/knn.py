@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import scipy.spatial
+import pandas as pd
 
 
 class KNNRegressor:
@@ -12,13 +13,17 @@ class KNNRegressor:
         self.y = None
 
     def fit(self, X, y):
-        #X = X.to_numpy()
-        y = y.to_numpy()
+        if isinstance(X, pd.core.series.Series) or isinstance(X, pd.DataFrame):
+            X = X.to_numpy()
+        if isinstance(y, pd.core.series.Series) or isinstance(y, pd.DataFrame):
+            y = y.to_numpy()
         self.KDTree = scipy.spatial.KDTree(X, leafsize=10, compact_nodes=True, copy_data=False, balanced_tree=True, boxsize=None)
         self.y = y
 
     def predict(self, X):
-        #X = X.to_numpy()
+        if isinstance(X, pd.DataFrame):
+            X = X.to_numpy()
+
         predictions = []
 
         for i in range(X.shape[0]):
