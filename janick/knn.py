@@ -12,13 +12,13 @@ class KNNRegressor:
         self.y = None
 
     def fit(self, X, y):
-        X = X.to_numpy()
+        #X = X.to_numpy()
         y = y.to_numpy()
         self.KDTree = scipy.spatial.KDTree(X, leafsize=10, compact_nodes=True, copy_data=False, balanced_tree=True, boxsize=None)
         self.y = y
 
     def predict(self, X):
-        X = X.to_numpy()
+        #X = X.to_numpy()
         predictions = []
 
         for i in range(X.shape[0]):
