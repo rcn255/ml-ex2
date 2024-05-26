@@ -7,15 +7,16 @@ class GDRegressor:
         self.learning_rate = learning_rate
         self.max_iter = max_iter
         self.history = []
-        self.optimal_w = 0
+        self.optimal_w = None
 
     def fit(self, X, y):
-        print(f"X shape: {X.shape}")
-        print(f"y shape: {y.shape}")
+        #print(f"X shape: {X.shape}")
+        #print(f"y shape: {y.shape}")
         w = np.random.randn(X.shape[1] + 1)
-        print(f"w: {w}")
+        #print(f"w: {w}")
         X_bias = np.c_[np.ones((X.shape[0], 1)), X]
-        print(f"X_bias shape: {X_bias.shape}")
+        #print(X_bias)
+        #print(f"X_bias shape: {X_bias.shape}")
         self.gradient_descent(X_bias, y, w)
 
     # RSS cost function
@@ -24,6 +25,12 @@ class GDRegressor:
         predictions = X.dot(w)
         errors = predictions - y
         return (1/(2*m)) * np.sum(errors**2)
+
+    def RMSE(self, X, y, w):
+        m = len(y)
+        predictions = X.dot(w)
+        errors = predictions - y
+        return np.sqrt((1/m) * np.sum(errors**2))
 
     # Gradient of the RSS cost function
     def RSS_gradient(self, X, y, w):
@@ -41,7 +48,7 @@ class GDRegressor:
             #print(f"gradient_result: {gradient_result}")
             print(f"Itaration {i}:\n New w: {w}\n Gradient: {gradient_result}")
 
-            self.history.append((w.copy(), self.RSS(X, y, w)))
+            self.history.append((w.copy(), self.RMSE(X, y, w)))
             self.optimal_w = w
         return
 
@@ -58,6 +65,24 @@ class GDRegressor:
         plt.xlabel('Iteration')
         plt.ylabel('Cost')
         plt.title('Cost Function History')
+        plt.show()
+
+    def plot_parameter_history(self):
+        # Plot parameter values over iterations
+        num_params = len(self.history[0][0])  # Number of parameters
+        num_features = num_params - 1  # Exclude bias term
+        for param_idx in range(num_params):
+            if param_idx == 0:
+                # Bias term
+                plt.plot([w[0][param_idx] for w in self.history], label='Bias')
+            else:
+                # Feature coefficients
+                feature_idx = param_idx - 1
+                plt.plot([w[0][param_idx] for w in self.history], label=f'θ{feature_idx}')
+        plt.xlabel('Iteration')
+        plt.ylabel('Parameter Value')
+        plt.title('Parameter Values Over Iterations')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         plt.show()
 
 if __name__ == '__main__':
