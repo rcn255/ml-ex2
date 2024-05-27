@@ -10,13 +10,8 @@ class GDRegressor:
         self.optimal_w = None
 
     def fit(self, X, y):
-        #print(f"X shape: {X.shape}")
-        #print(f"y shape: {y.shape}")
         w = np.random.randn(X.shape[1] + 1)
-        #print(f"w: {w}")
         X_bias = np.c_[np.ones((X.shape[0], 1)), X]
-        #print(X_bias)
-        #print(f"X_bias shape: {X_bias.shape}")
         self.gradient_descent(X_bias, y, w)
 
     # RSS cost function
@@ -26,6 +21,7 @@ class GDRegressor:
         errors = predictions - y
         return (1/(2*m)) * np.sum(errors**2)
 
+    # RMSE cost function for plot
     def RMSE(self, X, y, w):
         m = len(y)
         predictions = X.dot(w)
@@ -45,7 +41,6 @@ class GDRegressor:
             old_w = w
             gradient_result = self.RSS_gradient(X, y, w)
             w = w - self.learning_rate * gradient_result
-            #print(f"gradient_result: {gradient_result}")
             print(f"Itaration {i}:\n New w: {w}\n Gradient: {gradient_result}")
 
             self.history.append((w.copy(), self.RMSE(X, y, w)))
@@ -53,13 +48,11 @@ class GDRegressor:
         return
 
     def predict(self, X):
-        #print(self.optimal_w.shape)
         X_bias = np.c_[np.ones((X.shape[0], 1)), X]
-        #print(X_bias)
         return X_bias.dot(self.optimal_w)
 
+    # Plot the cost function history
     def plot_cost_history(self):
-        # Plot the cost function history
         costs = [h[1] for h in self.history]
         plt.plot(costs)
         plt.xlabel('Iteration')
@@ -67,9 +60,9 @@ class GDRegressor:
         plt.title('Cost Function History')
         plt.show()
 
+    # Plot parameter values over iterations
     def plot_parameter_history(self):
-        # Plot parameter values over iterations
-        num_params = len(self.history[0][0])  # Number of parameters
+        num_params = len(self.history[0][0])
         num_features = num_params - 1  # Exclude bias term
         for param_idx in range(num_params):
             if param_idx == 0:

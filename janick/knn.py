@@ -17,6 +17,7 @@ class KNNRegressor:
             X = X.to_numpy()
         if isinstance(y, pd.core.series.Series) or isinstance(y, pd.DataFrame):
             y = y.to_numpy()
+        # Initiating a KD tree to represent the training dataset
         self.KDTree = scipy.spatial.KDTree(X, leafsize=10, compact_nodes=True, copy_data=False, balanced_tree=True, boxsize=None)
         self.y = y
 
@@ -34,8 +35,11 @@ class KNNRegressor:
             nearest_values = self.y[indices]
 
             if self.strategy == 'average':
-                # Compute the average value of the nearest neighbors
                 average = np.mean(nearest_values)
                 predictions.append(average)
+            elif self.strategy == 'distance':
+                weights = 1 / (distances + 1e-5)
+                weighted_average = np.sum(weights * nearest_values) / np.sum(weights)
+                predictions.append(weighted_average)
 
         return np.array(predictions)
