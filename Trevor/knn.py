@@ -1,29 +1,36 @@
 import numpy as np
-from collections import Counter
+import math
+import scipy.spatial
 
-def euclidean_distance(x1, x2):
-    return np.sqrt(np.sum((x1 - x2)**2))
 
-class KNN:
+class KNNRegressor:
 
-    def __init__(self, k=3):
-        self.k = k
+    def __init__(self, n_neighbors=1, strategy='average'):
+        self.nn = n_neighbors
+        self.strategy = strategy
+        self.KDTree = None
+        self.y = None
 
     def fit(self, X, y):
-        self.X_train = X
-        self.y_train = y
+        #X = X.to_numpy()
+        y = y.to_numpy()
+        self.KDTree = scipy.spatial.KDTree(X, leafsize=10, compact_nodes=True, copy_data=False, balanced_tree=True, boxsize=None)
+        self.y = y
 
     def predict(self, X):
-        predicted_labels = [self._predict(x) for x in X]
-        return np.array(predicted_labels)
+        #X = X.to_numpy()
+        predictions = []
 
-    def _predict(self, x):
-        #Compute distances between x and all examples in the training set
-        distances = [euclidean_distance(x, x_train) for x_train in self.X_train]
-        #Sort by distance and return indices of the first k neighbors
-        k_indices = np.argsort(distances)[:self.k]
-        #Extract the labels of the k nearest neighbor training samples
-        k_nearest_labels = [self.y_train[i] for i in k_indices]
-        #Return the most common class label
-        most_common = Counter(k_nearest_labels).most_common(1)
-        return most_common[0][0]
+        for i in range(X.shape[0]):
+            # Find the nearest neighbors for the current test sample
+            distances, indices = self.KDTree.query(X[i], k=self.nn)
+
+            # Retrieve the corresponding values from y
+            nearest_values = self.y[indices]
+
+            if self.strategy == 'average':
+                # Compute the average value of the nearest neighbors
+                average = np.mean(nearest_values)
+                predictions.append(average)
+
+        return np.array(predictions)
