@@ -44,6 +44,3 @@ class GDRegressor:
         plt.ylabel('Cost')
         plt.title('Cost Function History')
         plt.show()
-
-
-
